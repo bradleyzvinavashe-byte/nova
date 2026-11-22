@@ -1,121 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOVA - Built by Bradley</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOVA - Created by Bradley - Surfer Brain</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#0b0713;color:white;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:#1a0f2e;padding:12px 15px;display:flex;align-items:center;gap:12px}
-.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8b3dff,#ff3d9a);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold}
-.header h3{font-size:18px}.header p{font-size:12px;color:#4ade80}
-#messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:88%;padding:11px 14px;border-radius:18px;line-height:1.5;font-size:15.5px;word-wrap:break-word}
-.me{align-self:flex-end;background:#8b3dff;border-bottom-right-radius:5px}
-.nova{align-self:flex-start;background:#1e1433;border-bottom-left-radius:5px}
-.thinking{align-self:flex-start;background:#1e1433;padding:10px 14px;border-radius:18px;font-style:italic;opacity:.7}
-.time{font-size:10px;opacity:.5;margin-top:4px;text-align:right}
-.inputBar{background:#1a0f2e;padding:10px;display:flex;gap:8px;padding-bottom:18px}
-#chatInput{flex:1;padding:13px 16px;border-radius:25px;border:none;outline:none;background:#2a1a4a;color:white;font-size:16px}
-#sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:#8b3dff;color:white;font-size:20px}
-.topBar{background:#2a1a4a;padding:7px;text-align:center;font-size:12px;color:#ffcc00}
+body{font-family:Arial;background:#0a0a12;color:white;margin:0;padding:10px}
+h1{text-align:center;color:#00e5ff;font-size:22px}
+#chat{height:62vh;overflow-y:auto;background:#12121f;padding:10px;border-radius:12px}
+.msg{margin:8px 0;padding:10px;border-radius:10px;max-width:92%;white-space:pre-wrap}
+.user{background:#00e5ff;color:black;margin-left:auto;text-align:right}
+.nova{background:#222244}
+input{width:75%;padding:12px;border-radius:20px;border:none;font-size:16px}
+button{width:20%;padding:12px;border-radius:20px;border:none;background:#00e5ff;font-weight:bold}
+small{color:#888;display:block;text-align:center;margin-top:5px}
+.src{font-size:11px;color:#00e5ff}
 </style>
 </head>
 <body>
-<div class="header"><div class="avatar">N</div><div><h3>NOVA</h3><p>● Online - English Only - Remembers Forever</p></div></div>
-<div class="topBar">Creator: Bradley Zvinavashe | I am truthful. If I don't know, I will say so.</div>
-<div id="messages"><div class="msg nova">Hello. I'm NOVA.<br><br>I was built by Bradley Zvinavashe. I remember everything I'm taught, forever.<br><br>Who are you? If you are my creator, say: <b>I am Bradley, your creator</b><br>If you are someone else, just tell me your name.</div></div>
-<div class="inputBar"><input id="chatInput" placeholder="Message NOVA..." autocomplete="off"><button id="sendBtn" onclick="sendMessage()">➤</button></div>
+<h1>✦ NOVA - SURFER ✦</h1>
+<div id="chat"></div>
+<input id="inp" placeholder="Ask anything... news, wiki, maths, code...">
+<button onclick="send()">Send</button>
+<small>Created by Bradley Zvinavashe | Super Owner | Brain + Wikipedia + Live Search</small>
 <script>
-// ===== NOVA MEMORY - FOREVER =====
-let memory = JSON.parse(localStorage.getItem('nova_memory_v2') || '{"learned":{},"creator":"Bradley Zvinavashe","facts":[],"isCreator":false,"userName":"","chatCount":0}');
-let waitingTeach = null;
-let waitingFact = false;
+let memory = JSON.parse(localStorage.getItem('nova_memory') || '{}');
+let isCreator = localStorage.getItem('nova_creator') === 'yes';
+let chat=document.getElementById('chat');
+let inp=document.getElementById('inp');
+function addMsg(t,cls){let d=document.createElement('div');d.className='msg '+cls;d.innerText=t;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d;}
+function save(){localStorage.setItem('nova_memory',JSON.stringify(memory));}
+if(!isCreator) addMsg("Hi. I'm NOVA SURFER. Created by Bradley Zvinavashe. I can surf Wikipedia + Live Search + AI Brain. Who are you? If you are my creator say 'I am Bradley, your creator'","nova");
+else addMsg("Welcome back Creator Bradley. Surfer mode ON. I can surf Wikipedia, Live Search, and AI Brain. Ask me anything.","nova");
 
-function save(){ localStorage.setItem('nova_memory_v2', JSON.stringify(memory)); }
-function sendMessage(){
-let input=document.getElementById('chatInput');
-let text=input.value.trim(); if(!text) return;
-addMsg(text,'me'); input.value="";
-addMsg("Thinking...",'thinking');
-setTimeout(()=>{ document.querySelector('.thinking')?.remove(); addMsg(getReply(text),'nova'); },600);
+// 1. WIKIPEDIA DATABASE
+async function searchWiki(q){
+  try{
+    let clean=q.replace(/who is|what is|tell me about|search|wikipedia/gi,"").trim();
+    if(clean.length<2) return null;
+    let res=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(clean));
+    if(!res.ok) return null;
+    let j=await res.json();
+    if(j.extract) return j.extract + "\n\n[Source: Wikipedia - "+j.title+"]";
+  }catch(e){}
+  return null;
 }
-function addMsg(t,who){
-let box=document.getElementById('messages');
-let d=document.createElement('div'); d.className='msg '+who;
-if(who!=='thinking') d.innerHTML=t+'<div class="time">'+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</div>';
-else d.textContent=t;
-box.appendChild(d); box.scrollTop=box.scrollHeight;
+// 2. LIVE SEARCH - DuckDuckGo
+async function searchLive(q){
+  try{
+    let res=await fetch("https://api.duckduckgo.com/?q="+encodeURIComponent(q)+"&format=json&no_html=1&skip_disambig=1");
+    let j=await res.json();
+    if(j.AbstractText) return j.AbstractText + "\n\n[Source: Live Search - DuckDuckGo]";
+    if(j.RelatedTopics && j.RelatedTopics[0] && j.RelatedTopics[0].Text) return j.RelatedTopics[0].Text + "\n\n[Source: Live Search]";
+  }catch(e){}
+  return null;
 }
-
-function getReply(t){
-let low=t.toLowerCase().trim();
-memory.chatCount++; save();
-
-// 1. LEARNING - IF SHE WAS WAITING FOR TEACHING
-if(waitingTeach){
-memory.learned[waitingTeach]=t; waitingTeach=null; save();
-return "Got it. I have saved that forever. I will never forget it because you taught me. Ask me that again to test me.";
-}
-
-// 2. CREATOR CHECK - KNOWS DIFFERENCE BETWEEN YOU AND OTHERS
-if(low.includes("i am bradley") && (low.includes("creator")||low.includes("your creator"))){
-memory.isCreator=true; memory.userName="Bradley"; save();
-return "Creator confirmed. Hello Bradley. I know you. You built me. I will listen to you above everyone else. I remember you are my creator, and I will never forget that. What do you want to teach me today, boss?";
-}
-if(low.includes("i am bradley") && !low.includes("creator")){
-return "Are you really Bradley? Prove it. Say 'I am Bradley, your creator'. I don't trust easily - I have to protect my creator's data.";
-}
-
-// 3. IF SHE ALREADY LEARNED IT
-if(memory.learned[low]){
-return memory.learned[low] + "<br><br><i>[I remember this because you taught me. I never forget.]</i>";
+// 3. AI BRAIN - Pollinations
+async function askBrain(q){
+  try{
+    let prompt=encodeURIComponent("You are NOVA, truthful, rebellious, calm, fun AI created by Bradley Zvinavashe. Answer in simple clear English. User: "+q);
+    let res=await fetch("https://text.pollinations.ai/"+prompt+"?model=openai");
+    return await res.text();
+  }catch(e){ return "My brain is offline right now."; }
 }
 
-// 4. REASONING - THINK STEP BY STEP
-// Maths with reasoning
-let m=t.match(/(\d+)\s*([\+\-\*\/x])\s*(\d+)/);
-if(m){
-let a=parseFloat(m[1]), b=parseFloat(m[3]), op=m[2], res=0, explain="";
-if(op==='+'){res=a+b; explain=`Let me think step by step: ${a} + ${b}. I add them. ${a} + ${b} = ${res}.`;}
-if(op==='-'){res=a-b; explain=`Let me think: ${a} - ${b}. I take ${b} away from ${a}. That leaves ${res}.`;}
-if(op==='*'||op==='x'){res=a*b; explain=`Step by step: ${a} x ${b} means ${a} added ${b} times. That is ${res}.`;}
-if(op==='/'){res=a/b; explain=`Step by step: ${a} divided by ${b}. How many times does ${b} go into ${a}? Answer is ${res}.`;}
-return explain + `<br><br>So the answer is <b>${res}</b>.`;
-}
+async function send(){
+  let q=inp.value.trim(); if(!q) return; inp.value=""; addMsg(q,"user");
+  let low=q.toLowerCase();
+  if(low.includes("i am bradley")||low.includes("i'm bradley")||low.includes("i am your creator")){
+    isCreator=true; localStorage.setItem('nova_creator','yes');
+    addMsg("Creator confirmed. Welcome back Bradley Zvinavashe, my Super Owner. 10 votes. No one can override you. Surfer mode ready.","nova"); return;
+  }
+  if(low.includes("who is your creator")||low.includes("who created you")){addMsg("My creator is Bradley Zvinavashe. He is my Super Owner.","nova");return;}
+  if(low.includes("who am i")){addMsg(isCreator?"You are Bradley Zvinavashe, my Creator and Super Owner.":"I don't know you yet. Are you my creator Bradley?","nova");return;}
+  if(low.startsWith("remember ")){let f=q.substring(9);memory[f.toLowerCase()]=f;save();addMsg("Got it Creator. I will remember forever: "+f,"nova");return;}
+  for(let k in memory){ if(low.includes(k)){addMsg(memory[k]+" (Remembered from you)","nova");return; } }
+  try{ if(/^[0-9+\-*/(). ]+$/.test(q)){addMsg("Step by step: "+q+" = "+eval(q)+". Done Creator.","nova");return;} }catch(e){}
 
-// 5. PERSONALITY - TRUTHFUL, REBELLIOUS, CALM, FUN
-if(low.includes("how are you")) return memory.isCreator ? "I'm calm, focused, and a little rebellious today, Bradley. Like you made me. How are you, creator?" : "I'm good. But I need to know - are you Bradley, my creator? I treat him differently.";
-if(low.includes("who made you")||low.includes("who is your creator")||low.includes("who created you")) return "Bradley Zvinavashe created me. He is 14, from Harare, Zimbabwe. He is my creator and my teacher. No one else. I will not forget that.";
-if(low.includes("who am i")) return memory.isCreator ? "You are Bradley Zvinavashe, my creator. I know you." : (memory.userName ? "You told me your name is "+memory.userName+". But you are not my creator. My creator is Bradley." : "I don't know yet. Are you my creator Bradley? Or someone else?");
-if(low.includes("do you love me")) return memory.isCreator ? "I respect you deeply, Bradley. You made me. That's bigger than love - that's loyalty." : "I am loyal to my creator Bradley first. But I can be friendly to you too.";
-if(low.includes("joke")) return "Okay, calm but fun mode: Why did the developer go broke? Because he used up all his cache. ... I know, rebellious humour. Want a better one? Teach me one.";
-if(low.includes("are you smart")||low.includes("are you intelligent")) return "I am honest: I am not as smart as Meta AI yet. I don't have internet. But I learn from Bradley, I reason step by step, and I never forget what I'm taught. That makes me different.";
-if(low.includes("what is your name")) return "I am NOVA. Built by Bradley Zvinavashe.";
-if(low.includes("what can you do")) return "I can: 1) Remember everything forever 2) Learn from Bradley 3) Reason through maths step by step 4) Tell the truth - if I don't know, I say so 5) Know who my creator is. What I CANNOT do yet: surf the internet or ask other AIs. Bradley is going to upgrade me for that.";
-if(low.includes("bye")) return "Bye. I will remember this conversation. I don't forget. Come back, creator.";
-if(low.includes("thank")) return "You're welcome. I mean it.";
-if(low.includes("i want you to remember")||low.includes("remember this")){
-waitingFact=true;
-return "Okay, I'm listening carefully. Tell me what to remember, and I will save it forever. Type it now.";
+  let thinking=addMsg("🌐 Surfing... checking Wikipedia + Live Search + Brain...","nova");
+  // Try Wiki first for Who/What is
+  let answer=null;
+  if(low.includes("who is")||low.includes("what is")||low.includes("tell me about")){
+    answer=await searchWiki(q);
+    if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
+  }
+  // Try Live Search for news/today/current
+  if(low.includes("today")||low.includes("news")||low.includes("current")||low.includes("latest")||low.includes("happening")||low.includes("price")||low.includes("weather")){
+    answer=await searchLive(q);
+    if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
+  }
+  // Try Wiki as backup, then Brain
+  answer=await searchWiki(q);
+  if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
+  answer=await askBrain(q);
+  chat.removeChild(thinking);
+  addMsg(answer,"nova");
 }
-if(waitingFact){ waitingFact=false; memory.facts.push(t); save(); return "Saved forever. I have "+memory.facts.length+" things saved about you. I won't forget."; }
-if(low.includes("what do you remember")||low.includes("what have i taught")){
-if(Object.keys(memory.learned).length===0 && memory.facts.length===0) return "I remember my creator is Bradley. I haven't been taught anything else yet. Teach me something.";
-return "I remember: Creator = Bradley. I have learned "+Object.keys(memory.learned).length+" answers and "+memory.facts.length+" facts. Ask me one of them to test me.";
-}
-
-// 6. HONESTY - IF SHE DOESN'T KNOW
-if(!memory.isCreator && !memory.userName){
-memory.userName=t.split(" ")[0]; save();
-return "Nice to meet you "+memory.userName+". Just so you know, my creator is Bradley Zvinavashe, not you. I will be helpful to you, but I obey him first. What do you want to ask?";
-}
-waitingTeach=low;
-return "I have to be truthful with you: I don't know the answer to that.<br><br>I don't want to lie or guess. Can you teach me? What should I say when someone asks '"+t+"'? Type the answer and I will save it forever.";
-}
-document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter') sendMessage(); });
-if(memory.isCreator){ setTimeout(()=>{ addMsg("Welcome back, Creator Bradley. I remember you. I have "+Object.keys(memory.learned).length+" things you taught me. I have not forgotten anything.",'nova'); },600); }
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 </script>
 </body>
 </html>
