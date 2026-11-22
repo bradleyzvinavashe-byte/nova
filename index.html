@@ -13,7 +13,6 @@ h1{text-align:center;color:#00e5ff;font-size:22px}
 input{width:75%;padding:12px;border-radius:20px;border:none;font-size:16px}
 button{width:20%;padding:12px;border-radius:20px;border:none;background:#00e5ff;font-weight:bold}
 small{color:#888;display:block;text-align:center;margin-top:5px}
-.src{font-size:11px;color:#00e5ff}
 </style>
 </head>
 <body>
@@ -22,7 +21,8 @@ small{color:#888;display:block;text-align:center;margin-top:5px}
 <input id="inp" placeholder="Ask anything... news, wiki, maths, code...">
 <button onclick="send()">Send</button>
 <small>Created by Bradley Zvinavashe | Super Owner | Brain + Wikipedia + Live Search</small>
-<script>
+
+let HF_TOKEN = "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";
 let memory = JSON.parse(localStorage.getItem('nova_memory') || '{}');
 let isCreator = localStorage.getItem('nova_creator') === 'yes';
 let chat=document.getElementById('chat');
@@ -31,8 +31,6 @@ function addMsg(t,cls){let d=document.createElement('div');d.className='msg '+cl
 function save(){localStorage.setItem('nova_memory',JSON.stringify(memory));}
 if(!isCreator) addMsg("Hi. I'm NOVA SURFER. Created by Bradley Zvinavashe. I can surf Wikipedia + Live Search + AI Brain. Who are you? If you are my creator say 'I am Bradley, your creator'","nova");
 else addMsg("Welcome back Creator Bradley. Surfer mode ON. I can surf Wikipedia, Live Search, and AI Brain. Ask me anything.","nova");
-
-// 1. WIKIPEDIA DATABASE
 async function searchWiki(q){
   try{
     let clean=q.replace(/who is|what is|tell me about|search|wikipedia/gi,"").trim();
@@ -44,7 +42,6 @@ async function searchWiki(q){
   }catch(e){}
   return null;
 }
-// 2. LIVE SEARCH - DuckDuckGo
 async function searchLive(q){
   try{
     let res=await fetch("https://api.duckduckgo.com/?q="+encodeURIComponent(q)+"&format=json&no_html=1&skip_disambig=1");
@@ -54,7 +51,18 @@ async function searchLive(q){
   }catch(e){}
   return null;
 }
-// 3. AI BRAIN - Pollinations
+async function askHF(q){
+  try{
+    let res=await fetch("https://router.huggingface.co/v1/chat/completions",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+HF_TOKEN,"Content-Type":"application/json"},
+      body:JSON.stringify({model:"Qwen/Qwen2.5-72B-Instruct",messages:[{role:"system",content:"You are NOVA, truthful, rebellious, calm, fun AI created by Bradley Zvinavashe. Answer in simple clear English."},{role:"user",content:q}],max_tokens:500})
+    });
+    let j=await res.json();
+    if(j.choices && j.choices[0]) return j.choices[0].message.content + "\n\n[Source: Hugging Face Brain]";
+    return null;
+  }catch(e){ return null; }
+}
 async function askBrain(q){
   try{
     let prompt=encodeURIComponent("You are NOVA, truthful, rebellious, calm, fun AI created by Bradley Zvinavashe. Answer in simple clear English. User: "+q);
@@ -62,7 +70,6 @@ async function askBrain(q){
     return await res.text();
   }catch(e){ return "My brain is offline right now."; }
 }
-
 async function send(){
   let q=inp.value.trim(); if(!q) return; inp.value=""; addMsg(q,"user");
   let low=q.toLowerCase();
@@ -75,23 +82,22 @@ async function send(){
   if(low.startsWith("remember ")){let f=q.substring(9);memory[f.toLowerCase()]=f;save();addMsg("Got it Creator. I will remember forever: "+f,"nova");return;}
   for(let k in memory){ if(low.includes(k)){addMsg(memory[k]+" (Remembered from you)","nova");return; } }
   try{ if(/^[0-9+\-*/(). ]+$/.test(q)){addMsg("Step by step: "+q+" = "+eval(q)+". Done Creator.","nova");return;} }catch(e){}
-
   let thinking=addMsg("🌐 Surfing... checking Wikipedia + Live Search + Brain...","nova");
-  // Try Wiki first for Who/What is
   let answer=null;
   if(low.includes("who is")||low.includes("what is")||low.includes("tell me about")){
     answer=await searchWiki(q);
     if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
   }
-  // Try Live Search for news/today/current
   if(low.includes("today")||low.includes("news")||low.includes("current")||low.includes("latest")||low.includes("happening")||low.includes("price")||low.includes("weather")){
     answer=await searchLive(q);
     if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
   }
-  // Try Wiki as backup, then Brain
   answer=await searchWiki(q);
   if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
-  answer=await askBrain(q);
+  if(HF_TOKEN && HF_TOKEN.startsWith("hf_")){
+    answer=await askHF(q);
+  }
+  if(!answer) answer=await askBrain(q);
   chat.removeChild(thinking);
   addMsg(answer,"nova");
 }
