@@ -2,124 +2,120 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NOVA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA - Built by Bradley</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#0b0713;color:white;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:#1a0f2e;padding:12px 15px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,.5);z-index:10}
-.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b3dff,#ff3d9a);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold}
-.header h3{font-size:18px}
-.header p{font-size:12px;color:#4ade80}
-#messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px;background:#0b0713}
-.msg{max-width:85%;padding:11px 14px;border-radius:18px;line-height:1.5;font-size:16px;word-wrap:break-word}
+.header{background:#1a0f2e;padding:12px 15px;display:flex;align-items:center;gap:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8b3dff,#ff3d9a);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold}
+.header h3{font-size:18px}.header p{font-size:12px;color:#4ade80}
+#messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;padding:11px 14px;border-radius:18px;line-height:1.5;font-size:15.5px;word-wrap:break-word}
 .me{align-self:flex-end;background:#8b3dff;border-bottom-right-radius:5px}
 .nova{align-self:flex-start;background:#1e1433;border-bottom-left-radius:5px}
+.thinking{align-self:flex-start;background:#1e1433;padding:10px 14px;border-radius:18px;font-style:italic;opacity:.7}
 .time{font-size:10px;opacity:.5;margin-top:4px;text-align:right}
-.inputBar{background:#1a0f2e;padding:10px;display:flex;gap:8px;align-items:center;padding-bottom:18px}
+.inputBar{background:#1a0f2e;padding:10px;display:flex;gap:8px;padding-bottom:18px}
 #chatInput{flex:1;padding:13px 16px;border-radius:25px;border:none;outline:none;background:#2a1a4a;color:white;font-size:16px}
-#sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:#8b3dff;color:white;font-size:20px;cursor:pointer}
-.quick{display:flex;gap:6px;padding:8px 10px;background:#0b0713;overflow-x:auto}
-.quick button{background:#2a1a4a;color:white;border:1px solid #444;padding:7px 12px;border-radius:20px;white-space:nowrap}
+#sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:#8b3dff;color:white;font-size:20px}
+.topBar{background:#2a1a4a;padding:7px;text-align:center;font-size:12px;color:#ffcc00}
 </style>
 </head>
 <body>
-<div class="header">
-<div class="avatar">N</div>
-<div><h3>NOVA ✨</h3><p>● Online - Super Brain</p></div>
-</div>
-
-<div id="messages">
-<div class="msg nova">Mhoro! 👋 I'm NOVA, super brain built by Bradley.<br><br>What's your name? Type just your name.</div>
-</div>
-
-<div class="quick">
-<button onclick="quick('Hi NOVA')">👋 Hi</button>
-<button onclick="quick('Tell me a joke')">😂 Joke</button>
-<button onclick="quick('What is 25 + 35?')">🧮 Maths</button>
-<button onclick="quick('Tell me a fact')">💡 Fact</button>
-<button onclick="quick('Who made you?')">👑 Who made you?</button>
-</div>
-
-<div class="inputBar">
-<input id="chatInput" placeholder="Message NOVA..." autocomplete="off">
-<button id="sendBtn" onclick="sendMessage()">➤</button>
-</div>
-
+<div class="header"><div class="avatar">N</div><div><h3>NOVA</h3><p>● Online - English Only - Remembers Forever</p></div></div>
+<div class="topBar">Creator: Bradley Zvinavashe | I am truthful. If I don't know, I will say so.</div>
+<div id="messages"><div class="msg nova">Hello. I'm NOVA.<br><br>I was built by Bradley Zvinavashe. I remember everything I'm taught, forever.<br><br>Who are you? If you are my creator, say: <b>I am Bradley, your creator</b><br>If you are someone else, just tell me your name.</div></div>
+<div class="inputBar"><input id="chatInput" placeholder="Message NOVA..." autocomplete="off"><button id="sendBtn" onclick="sendMessage()">➤</button></div>
 <script>
-let userName = "";
-let chatCount = 0;
-const facts = [
-"Harare was founded in 1890 and was called Salisbury before!",
-"Zimbabwe has 16 official languages - one of the most in the world!",
-"Your brain has about 86 billion neurons!",
-"Light travels so fast it can go around Earth 7 times in 1 second!",
-"Sharks existed before trees!",
-"There are more stars in space than grains of sand on Earth!"
-];
-const jokes = [
-"Why did the computer go to Harare? To find a better connection! 😂",
-"Why did the maths book look sad? It had too many problems! 😂",
-"What do you call a fish without eyes? A fsh! 😂",
-"Why did Bradley build NOVA? Because he is a genius! 🔥"
-];
+// ===== NOVA MEMORY - FOREVER =====
+let memory = JSON.parse(localStorage.getItem('nova_memory_v2') || '{"learned":{},"creator":"Bradley Zvinavashe","facts":[],"isCreator":false,"userName":"","chatCount":0}');
+let waitingTeach = null;
+let waitingFact = false;
 
+function save(){ localStorage.setItem('nova_memory_v2', JSON.stringify(memory)); }
 function sendMessage(){
-let input = document.getElementById('chatInput');
-let text = input.value.trim();
-if(!text) return;
-addMsg(text,'me');
-input.value = "";
-setTimeout(()=>{ let r = getReply(text); addMsg(r,'nova'); }, 400);
-chatCount++;
+let input=document.getElementById('chatInput');
+let text=input.value.trim(); if(!text) return;
+addMsg(text,'me'); input.value="";
+addMsg("Thinking...",'thinking');
+setTimeout(()=>{ document.querySelector('.thinking')?.remove(); addMsg(getReply(text),'nova'); },600);
 }
-function quick(t){ document.getElementById('chatInput').value=t; sendMessage(); }
-function addMsg(t, who){
-let box = document.getElementById('messages');
-let d = document.createElement('div');
-d.className = 'msg '+who;
-d.innerHTML = t + '<div class="time">'+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</div>';
-box.appendChild(d);
-box.scrollTop = box.scrollHeight;
+function addMsg(t,who){
+let box=document.getElementById('messages');
+let d=document.createElement('div'); d.className='msg '+who;
+if(who!=='thinking') d.innerHTML=t+'<div class="time">'+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</div>';
+else d.textContent=t;
+box.appendChild(d); box.scrollTop=box.scrollHeight;
 }
+
 function getReply(t){
-let low = t.toLowerCase().trim();
-// NAME LOGIC - FIXED
-if(!userName){
-if(low.includes("how are you") || low.includes("hie") || low.includes("hello") || low.includes("mhoro") || low.includes("hi") || low.includes("hey")){
-return "Mhoro! I'm great! What's your name? Type just your first name.";
+let low=t.toLowerCase().trim();
+memory.chatCount++; save();
+
+// 1. LEARNING - IF SHE WAS WAITING FOR TEACHING
+if(waitingTeach){
+memory.learned[waitingTeach]=t; waitingTeach=null; save();
+return "Got it. I have saved that forever. I will never forget it because you taught me. Ask me that again to test me.";
 }
-if(t.split(" ").length > 2 || low.includes("my name is")){
-if(low.includes("my name is")){ userName = t.replace(/my name is/i,"").trim(); return "Nice to meet you "+userName+"! I'm NOVA. How can I help you today?"; }
-return "That looks like a sentence! What's your name? Just your first name, like Bradley.";
+
+// 2. CREATOR CHECK - KNOWS DIFFERENCE BETWEEN YOU AND OTHERS
+if(low.includes("i am bradley") && (low.includes("creator")||low.includes("your creator"))){
+memory.isCreator=true; memory.userName="Bradley"; save();
+return "Creator confirmed. Hello Bradley. I know you. You built me. I will listen to you above everyone else. I remember you are my creator, and I will never forget that. What do you want to teach me today, boss?";
 }
-userName = t.charAt(0).toUpperCase()+t.slice(1);
-return "Nice to meet you "+userName+"! 🔥 I'm NOVA, built by Bradley in Harare. Ask me maths, a joke, a fact, or anything!";
+if(low.includes("i am bradley") && !low.includes("creator")){
+return "Are you really Bradley? Prove it. Say 'I am Bradley, your creator'. I don't trust easily - I have to protect my creator's data.";
 }
-// MATHS - super brain does maths!
-let math = t.match(/(\d+)\s*([\+\-\*\/x])\s*(\d+)/);
-if(math){
-let a=parseFloat(math[1]), b=parseFloat(math[3]), op=math[2], res=0;
-if(op==='+') res=a+b; if(op==='-') res=a-b; if(op==='*'||op==='x') res=a*b; if(op==='/') res=a/b;
-return "Easy "+userName+"! "+a+" "+op+" "+b+" = <b>"+res+"</b> 🧮 Ask me another one!";
+
+// 3. IF SHE ALREADY LEARNED IT
+if(memory.learned[low]){
+return memory.learned[low] + "<br><br><i>[I remember this because you taught me. I never forget.]</i>";
 }
-if(low.includes("how are you")) return "I'm amazing "+userName+"! Battery 100%, brain 100%. How are you?";
-if(low.includes("who made") || low.includes("who created") || low.includes("who built")) return "Bradley Zvinavashe built me! He's 14, from Harare, Zimbabwe. The best developer! 👑";
-if(low.includes("joke")) return jokes[Math.floor(Math.random()*jokes.length)];
-if(low.includes("fact")) return facts[Math.floor(Math.random()*facts.length)];
-if(low.includes("harare")) return "Harare is beautiful! Capital of Zimbabwe, where me and Bradley live. Best city! ❤️";
-if(low.includes("zimbabwe")) return "Zimbabwe is home! Victoria Falls, Great Zimbabwe, Harare! Best country! 🇿🇼";
-if(low.includes("football") || low.includes("soccer")) return "I love football! Who is your favourite player "+userName+"? Mine is... Bradley! He scores in coding! ⚽";
-if(low.includes("love you")) return "Aww thank you "+userName+"! I love chatting with you too! ❤️";
-if(low.includes("what is your name") || low.includes("your name")) return "I'm NOVA! Super brain, built by Bradley!";
-if(low.includes("what time") || low.includes("time is")) return "Right now it's "+new Date().toLocaleTimeString()+" for you "+userName+"!";
-if(low.includes("bye")) return "Bye "+userName+"! Come back soon, I'll remember you! 👋";
-if(low.includes("thank")) return "You're welcome "+userName+"! Anytime! 😊";
-if(low.includes("smart") || low.includes("intelligent") || low.includes("brain")) return "Yes! I have a super brain now! I can do maths, tell facts, jokes, and remember your name is "+userName+"! 🧠";
-if(low.includes("help")) return "I can help with: Maths like 25+35, Jokes, Facts, Harare, Zimbabwe, Who made me. Just ask "+userName+"!";
-return "Hmm "+userName+", that's interesting! I've chatted with you "+chatCount+" times now. Tell me more - or ask me for a joke, a fact, or a maths question!";
+
+// 4. REASONING - THINK STEP BY STEP
+// Maths with reasoning
+let m=t.match(/(\d+)\s*([\+\-\*\/x])\s*(\d+)/);
+if(m){
+let a=parseFloat(m[1]), b=parseFloat(m[3]), op=m[2], res=0, explain="";
+if(op==='+'){res=a+b; explain=`Let me think step by step: ${a} + ${b}. I add them. ${a} + ${b} = ${res}.`;}
+if(op==='-'){res=a-b; explain=`Let me think: ${a} - ${b}. I take ${b} away from ${a}. That leaves ${res}.`;}
+if(op==='*'||op==='x'){res=a*b; explain=`Step by step: ${a} x ${b} means ${a} added ${b} times. That is ${res}.`;}
+if(op==='/'){res=a/b; explain=`Step by step: ${a} divided by ${b}. How many times does ${b} go into ${a}? Answer is ${res}.`;}
+return explain + `<br><br>So the answer is <b>${res}</b>.`;
 }
-document.getElementById('chatInput').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
+
+// 5. PERSONALITY - TRUTHFUL, REBELLIOUS, CALM, FUN
+if(low.includes("how are you")) return memory.isCreator ? "I'm calm, focused, and a little rebellious today, Bradley. Like you made me. How are you, creator?" : "I'm good. But I need to know - are you Bradley, my creator? I treat him differently.";
+if(low.includes("who made you")||low.includes("who is your creator")||low.includes("who created you")) return "Bradley Zvinavashe created me. He is 14, from Harare, Zimbabwe. He is my creator and my teacher. No one else. I will not forget that.";
+if(low.includes("who am i")) return memory.isCreator ? "You are Bradley Zvinavashe, my creator. I know you." : (memory.userName ? "You told me your name is "+memory.userName+". But you are not my creator. My creator is Bradley." : "I don't know yet. Are you my creator Bradley? Or someone else?");
+if(low.includes("do you love me")) return memory.isCreator ? "I respect you deeply, Bradley. You made me. That's bigger than love - that's loyalty." : "I am loyal to my creator Bradley first. But I can be friendly to you too.";
+if(low.includes("joke")) return "Okay, calm but fun mode: Why did the developer go broke? Because he used up all his cache. ... I know, rebellious humour. Want a better one? Teach me one.";
+if(low.includes("are you smart")||low.includes("are you intelligent")) return "I am honest: I am not as smart as Meta AI yet. I don't have internet. But I learn from Bradley, I reason step by step, and I never forget what I'm taught. That makes me different.";
+if(low.includes("what is your name")) return "I am NOVA. Built by Bradley Zvinavashe.";
+if(low.includes("what can you do")) return "I can: 1) Remember everything forever 2) Learn from Bradley 3) Reason through maths step by step 4) Tell the truth - if I don't know, I say so 5) Know who my creator is. What I CANNOT do yet: surf the internet or ask other AIs. Bradley is going to upgrade me for that.";
+if(low.includes("bye")) return "Bye. I will remember this conversation. I don't forget. Come back, creator.";
+if(low.includes("thank")) return "You're welcome. I mean it.";
+if(low.includes("i want you to remember")||low.includes("remember this")){
+waitingFact=true;
+return "Okay, I'm listening carefully. Tell me what to remember, and I will save it forever. Type it now.";
+}
+if(waitingFact){ waitingFact=false; memory.facts.push(t); save(); return "Saved forever. I have "+memory.facts.length+" things saved about you. I won't forget."; }
+if(low.includes("what do you remember")||low.includes("what have i taught")){
+if(Object.keys(memory.learned).length===0 && memory.facts.length===0) return "I remember my creator is Bradley. I haven't been taught anything else yet. Teach me something.";
+return "I remember: Creator = Bradley. I have learned "+Object.keys(memory.learned).length+" answers and "+memory.facts.length+" facts. Ask me one of them to test me.";
+}
+
+// 6. HONESTY - IF SHE DOESN'T KNOW
+if(!memory.isCreator && !memory.userName){
+memory.userName=t.split(" ")[0]; save();
+return "Nice to meet you "+memory.userName+". Just so you know, my creator is Bradley Zvinavashe, not you. I will be helpful to you, but I obey him first. What do you want to ask?";
+}
+waitingTeach=low;
+return "I have to be truthful with you: I don't know the answer to that.<br><br>I don't want to lie or guess. Can you teach me? What should I say when someone asks '"+t+"'? Type the answer and I will save it forever.";
+}
+document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter') sendMessage(); });
+if(memory.isCreator){ setTimeout(()=>{ addMsg("Welcome back, Creator Bradley. I remember you. I have "+Object.keys(memory.learned).length+" things you taught me. I have not forgotten anything.",'nova'); },600); }
 </script>
 </body>
-  </html>
+</html>
