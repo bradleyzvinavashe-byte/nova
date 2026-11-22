@@ -11,39 +11,86 @@ body{background:#0b021a;color:white;text-align:center}
 .hero h1{font-size:70px;letter-spacing:8px}
 .hero h1 span{color:#b06bff}
 .hero p{margin:15px 0 30px;opacity:.8;font-size:18px;max-width:600px}
-.btn{background:#8b3dff;color:white;padding:15px 30px;border-radius:30px;text-decoration:none;font-weight:bold;display:inline-block}
+.btn{background:#8b3dff;color:white;padding:15px 30px;border-radius:30px;text-decoration:none;font-weight:bold;display:inline-block;border:none;cursor:pointer}
 .section{padding:60px 20px;max-width:900px;margin:auto}
 .section h2{font-size:32px;margin-bottom:20px}
 .cards{display:flex;flex-wrap:wrap;gap:15px;justify-content:center}
 .card{background:#1c0b3a;padding:25px;border-radius:15px;width:260px;text-align:left}
 .card h3{margin-bottom:10px;color:#c99bff}
 .card p{opacity:.8;font-size:15px;line-height:1.5}
+#chatBox{background:#1c0b3a;border-radius:15px;padding:15px;text-align:left;max-width:600px;margin:auto}
+#messages{height:300px;overflow-y:auto;background:#0b021a;border-radius:10px;padding:12px;margin-bottom:10px}
+#messages p{margin:8px 0;line-height:1.5}
+#chatInput{width:70%;padding:12px;border-radius:20px;border:none;outline:none}
+#sendBtn{background:#8b3dff;color:white;padding:12px 20px;border-radius:20px;border:none;font-weight:bold}
 footer{padding:30px;opacity:.6}
 </style>
 </head>
 <body>
 <div class="hero">
 <h1>N<span>O</span>VA</h1>
-<p>Welcome to NOVA. Built by Bradley.</p>
-<a class="btn" href="#features">Explore NOVA ↓</a>
+<p>Welcome to NOVA. Built by Bradley. Now with a brain.</p>
+<a class="btn" href="#chat">Talk to NOVA ↓</a>
+</div>
+
+<div class="section" id="chat">
+<h2>Chat with NOVA</h2>
+<div id="chatBox">
+<div id="messages"><p><b>NOVA:</b> Mhoro! I'm NOVA. What's your name?</p></div>
+<input id="chatInput" placeholder="Type here...">
+<button id="sendBtn" onclick="sendMessage()">Send</button>
+<br><br>
+<button onclick="quick('Mhoro')" style="padding:8px 12px;border-radius:15px;border:none">Mhoro</button>
+<button onclick="quick('Tell me a joke')" style="padding:8px 12px;border-radius:15px;border:none">Joke</button>
+<button onclick="quick('Who made you?')" style="padding:8px 12px;border-radius:15px;border:none">Who made you?</button>
+</div>
 </div>
 
 <div class="section" id="features">
 <h2>Features</h2>
 <div class="cards">
-<div class="card"><h3>⚡ Fast</h3><p>NOVA is built to be fast, clean and simple to use on any device.</p></div>
-<div class="card"><h3>🎨 Beautiful Design</h3><p>Modern purple design made to stand out and feel premium.</p></div>
-<div class="card"><h3>🚀 Built by Bradley</h3><p>Created from scratch by Bradley Zvinavashe. More features coming soon.</p></div>
+<div class="card"><h3>⚡ Fast</h3><p>NOVA is fast, clean and simple.</p></div>
+<div class="card"><h3>🧠 Smart Brain</h3><p>NOVA remembers your name and answers you.</p></div>
+<div class="card"><h3>🚀 Built by Bradley</h3><p>Created by Bradley Zvinavashe in Harare.</p></div>
 </div>
-</div>
-
-<div class="section" id="about">
-<h2>About NOVA</h2>
-<p style="opacity:.8;line-height:1.7">NOVA is my first live website. I'm building it step by step - learning, creating and improving every day. Stay tuned for what's next.</p>
-<br>
-<a class="btn" href="#features">Back to Top ↑</a>
 </div>
 
 <footer>© 2026 NOVA - Built by Bradley</footer>
+
+<script>
+let userName = "";
+let chatCount = 0;
+function sendMessage(){
+let input = document.getElementById('chatInput');
+let text = input.value.trim();
+if(!text) return;
+let box = document.getElementById('messages');
+box.innerHTML += "<p><b>You:</b> " + text + "</p>";
+let reply = getReply(text);
+box.innerHTML += "<p><b>NOVA:</b> " + reply + "</p>";
+box.scrollTop = box.scrollHeight;
+input.value = "";
+chatCount++;
+}
+function quick(t){ document.getElementById('chatInput').value = t; sendMessage(); }
+function getReply(t){
+let low = t.toLowerCase();
+if(!userName){
+userName = t;
+return "Nice to meet you " + userName + "! I'm NOVA, built by Bradley in Harare. How are you?";
+}
+if(low.includes("how are you") || low.includes("how are u")) return "I'm great " + userName + "! My battery is 100%. How are you feeling today?";
+if(low.includes("mhoro") || low.includes("hello") || low.includes("hi")) return "Mhoro " + userName + "! Good to see you again!";
+if(low.includes("who made") || low.includes("who created")) return "Bradley Zvinavashe made me! He's 14, from Harare, and he's a genius.";
+if(low.includes("joke")) return "Why did the computer go to Harare? To find a better connection! 😂 Want another?";
+if(low.includes("harare")) return "Harare is beautiful! Capital of Zimbabwe. That's where me and Bradley live!";
+if(low.includes("football") || low.includes("soccer")) return "I love football! Who's your favourite team " + userName + "?";
+if(low.includes("love you") || low.includes("i love")) return "Aww thank you " + userName + "! I like talking to you too!";
+if(low.includes("bye")) return "Bye " + userName + "! Come back soon, I'll remember you!";
+if(low.includes("battery")) return "Battery at 100%! Bradley keeps me charged!";
+return "Hmm " + userName + ", that's interesting! Tell me more about that. I have talked with you " + (chatCount+1) + " times now!";
+}
+document.getElementById('chatInput').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
+</script>
 </body>
-  </html>
+</html>
