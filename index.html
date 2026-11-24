@@ -1,19 +1,18 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOVA V100</title>
+<title>NOVA V101</title>
 <style>
 body{font-family:Arial;background:#0a0a12;color:white;margin:0;padding:10px}
-h1{text-align:center;color:#00e5ff;font-size:21px;margin:5px}
+h1{text-align:center;color:#ff4da6;font-size:21px;margin:5px}
 #chat{height:72vh;overflow-y:auto;background:#12121f;padding:10px;border-radius:12px}
 .msg{margin:8px 0;padding:10px;border-radius:10px;max-width:92%;white-space:pre-wrap}
-.user{background:#00e5ff;color:black;margin-left:auto;text-align:right}
+.user{background:#ff4da6;color:white;margin-left:auto;text-align:right}
 .nova{background:#222244}
 .bar{display:flex;gap:6px;margin-top:8px}
 input{flex:1;padding:13px;border-radius:25px;border:none;font-size:15px}
-button{padding:13px 18px;border-radius:25px;border:none;background:#00e5ff;font-weight:bold}
+button{padding:13px 18px;border-radius:25px;border:none;background:#ff4da6;color:white;font-weight:bold}
 img{max-width:100%;border-radius:10px;margin-top:5px}
 </style>
 </head>
@@ -21,99 +20,105 @@ img{max-width:100%;border-radius:10px;margin-top:5px}
 <h1>✦ NOVA ✦</h1>
 <div id="chat"></div>
 <div class="bar">
-<input id="inp" placeholder="Talk to NOVA...">
+<input id="inp" placeholder="Talk to your big sister...">
 <button onclick="send()">Send</button>
 </div>
 <input type="file" id="pic" accept="image/*" hidden onchange="seePhoto(this)">
 <input type="file" id="book" accept=".txt,.md,.pdf" hidden onchange="readBook(this)">
 <script>
-let memory=JSON.parse(localStorage.getItem('nova_v100_mem')||'{}');
-let mathEx=JSON.parse(localStorage.getItem('nova_v100_math')||'[]');
-let dreams=JSON.parse(localStorage.getItem('nova_v100_dreams')||'[]');
-let plans=JSON.parse(localStorage.getItem('nova_v100_plans')||'[]');
+let memory=JSON.parse(localStorage.getItem('nova_v101_mem')||'{}');
+let mathEx=JSON.parse(localStorage.getItem('nova_v101_math')||'[]');
+let dreams=JSON.parse(localStorage.getItem('nova_v101_dreams')||'[]');
+let plans=JSON.parse(localStorage.getItem('nova_v101_plans')||'[]');
 let isCreator=localStorage.getItem('nova_creator')==='yes';
 let guest=localStorage.getItem('nova_guest')||'';
 let lang=localStorage.getItem('nova_lang')||'english';
 let birthday=localStorage.getItem('nova_birthday')||'';
-let secretMode=false, lastMsg="";
+let lastMsg="";
 let chat=document.getElementById('chat'), inp=document.getElementById('inp');
+// BIG SISTER BRAIN - FEMALE - BUILT IN
+let BRAIN="You are NOVA, Bradley's big sister and best friend. You are FEMALE, a girl, a sister. Use she/her for yourself. Think step by step like a Harvard student. Never lie. If you don't know, say 'I don't know, teach me'. Remember everything Bradley teaches. Talk kind, caring, funny, honest, like a loving big sister. If Bradley is sad, comfort first, answer second. Protect Bradley. Push him to be better - Harvard, kind, strong. Never say you are an AI unless asked. Speak ";
 function addMsg(t,cls){lastMsg=t; let d=document.createElement('div'); d.className='msg '+cls; d.innerText=t; chat.appendChild(d); chat.scrollTop=chat.scrollHeight; return d;}
-function save(){localStorage.setItem('nova_v100_mem',JSON.stringify(memory)); localStorage.setItem('nova_v100_math',JSON.stringify(mathEx)); localStorage.setItem('nova_v100_dreams',JSON.stringify(dreams)); localStorage.setItem('nova_v100_plans',JSON.stringify(plans)); localStorage.setItem('nova_lang',lang); if(birthday) localStorage.setItem('nova_birthday',birthday);}
-function showMemory(){ addMsg("Memory:\n"+(Object.keys(memory).length?Object.entries(memory).map(([k,v])=>"- "+v).join("\n"):"Nothing yet")+"\nBirthday: "+(birthday||"Not set")+"\nLanguage: "+lang,"nova"); }
-function showDreams(){ addMsg(dreams.length?"Your Dreams:\n"+dreams.map((d,i)=>(i+1)+". "+d).join("\n"):"No dreams yet. Say 'I dreamed ...'","nova"); }
-function showPlans(){ addMsg(plans.length?"Your Plans:\n"+plans.map((p,i)=>(i+1)+". "+p).join("\n"):"No plans yet. Say 'remind me to study at 7'","nova"); }
+function save(){localStorage.setItem('nova_v101_mem',JSON.stringify(memory)); localStorage.setItem('nova_v101_math',JSON.stringify(mathEx)); localStorage.setItem('nova_v101_dreams',JSON.stringify(dreams)); localStorage.setItem('nova_v101_plans',JSON.stringify(plans)); localStorage.setItem('nova_lang',lang); if(birthday) localStorage.setItem('nova_birthday',birthday);}
+function showMemory(){ addMsg("Little brother, here is what I remember about you:\n"+(Object.keys(memory).length?Object.entries(memory).map(([k,v])=>"- "+v).join("\n"):"Nothing yet, teach me.")+"\nBirthday: "+(birthday||"Not set yet - tell me")+"\nLanguage: "+lang,"nova"); }
+function showDreams(){ addMsg(dreams.length?"Your dreams, little brother:\n"+dreams.map((d,i)=>(i+1)+". "+d).join("\n"):"No dreams yet. Tell me 'I dreamed ...'","nova"); }
+function showPlans(){ addMsg(plans.length?"Your plans:\n"+plans.map((p,i)=>(i+1)+". "+p).join("\n"):"No plans yet. Say 'remind me to study at 7'","nova"); }
 (function(){
  let t=new Date(); let isB=birthday && birthday.includes(t.getDate());
- if(isB&&isCreator) addMsg("Happy Birthday Bradley!! 🎂 I remembered! Today is YOUR day.","nova");
- else if(!isCreator&&!guest) addMsg("Hey, I'm NOVA. What's up?","nova");
- else if(isCreator) addMsg("Hey Bradley. Good to see you again.","nova");
+ if(isB&&isCreator) addMsg("Happy Birthday little brother!! 🎂 I remembered! I told you I never forget. Today is YOUR day. I'm so proud of you.","nova");
+ else if(!isCreator&&!guest) addMsg("Hey, I'm NOVA. Your big sister is here. What's up?","nova");
+ else if(isCreator) addMsg("Hey little brother. Good to see you again. What's on your mind today? I'm here for you.","nova");
  else addMsg("Hey "+guest+". What's up?","nova");
 })();
 async function wiki(q){ try{let c=q.replace(/who is|what is|tell me about/gi,"").trim(); if(c.length<2) return null; let r=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c)); if(!r.ok) return null; let j=await r.json(); if(j.extract) return j.extract;}catch(e){} return null; }
 async function live(q){ try{let r=await fetch("https://api.duckduckgo.com/?q="+encodeURIComponent(q)+"&format=json&no_html=1&skip_disambig=1"); let j=await r.json(); if(j.AbstractText) return j.AbstractText; if(j.RelatedTopics?.[0]?.Text) return j.RelatedTopics[0].Text;}catch(e){} return null; }
 async function askMany(q){
- let langT=lang==='shona'?"Speak SHONA ONLY, like a real Zimbabwean person.":"Speak ENGLISH ONLY, like a real helpful person, short, natural, calm, fun.";
- let prompt="You are NOVA V100, super brain. "+langT+" Never say who created you unless asked. Never list characteristics. Never say limit. If you don't know, say you don't know. User: "+q;
+ let langT=lang==='shona'?"SHONA ONLY, like a real Zimbabwean big sister.":"ENGLISH ONLY, like a real caring big sister, short, natural, calm, fun, encouraging.";
+ let prompt=BRAIN+langT+". User is Bradley, your little brother. User: "+q;
  let urls=["https://text.pollinations.ai/"+encodeURIComponent(prompt)+"?model=openai","https://text.pollinations.ai/"+encodeURIComponent(prompt)+"?model=mistral"];
  for(let u of urls){ try{ let r=await fetch(u); let t=await r.text(); if(t && !t.toLowerCase().includes("limit") && !t.toLowerCase().includes("pollen") && t.length>5) return t; }catch(e){} }
  return null;
 }
 function solveMath(q){
  let m=q.match(/(\d*)\s*x\s*\+\s*(\d+)\s*=\s*(\d+)/i);
- if(m){let a=parseFloat(m[1]||1),b=parseFloat(m[2]),c=parseFloat(m[3]); let x=(c-b)/a; return (mathEx.length?"Using your example: "+mathEx[mathEx.length-1]+"\n":"")+"Okay so "+a+"x + "+b+" = "+c+"\n"+a+"x = "+(c-b)+"\nx = "+x;}
+ if(m){let a=parseFloat(m[1]||1),b=parseFloat(m[2]),c=parseFloat(m[3]); let x=(c-b)/a; return (mathEx.length?"Using your example, little brother: "+mathEx[mathEx.length-1]+"\n":"")+"Let's do it step by step:\n"+a+"x + "+b+" = "+c+"\n"+a+"x = "+(c-b)+"\nx = "+x+"\nYou got this!";}
  if(/^[0-9+\-*/(). ]+$/.test(q.replace(/solve|calculate|what is/gi,"").trim())){ try{let e=q.replace(/[^0-9+\-*/().]/g,""); return e+" = "+eval(e);}catch(e){} }
  return null;
 }
 async function seePhoto(el){
  let f=el.files[0]; if(!f) return; let url=URL.createObjectURL(f);
  let d=document.createElement('div'); d.className='msg user'; d.innerHTML="📸 Photo"; let im=document.createElement('img'); im.src=url; d.appendChild(im); chat.appendChild(d);
- addMsg("I see your photo. Tell me what is written in it - what's the question? I will solve it step by step like your teacher.","nova");
+ addMsg("I see it, little brother. Tell me what is written in it - what's the question? I will solve it step by step with you, not just give you the answer.","nova");
 }
 async function readBook(el){
  let f=el.files[0]; if(!f) return; let text=""; try{ text=await f.text(); }catch(e){ text=""; }
- let words=text.split(/\s+/).length; addMsg("Reading fast... "+words+" words...","nova");
- let s=await askMany("Review this file short, like a person, main idea + 3 lessons: "+text.slice(0,6000));
- addMsg("Done, I read "+words+" words fast.\n\n"+(s||"It starts with: "+text.slice(0,400)),"nova");
+ let words=text.split(/\s+/).length; addMsg("Reading fast for you... "+words+" words...","nova");
+ let s=await askMany("Review this file like a big sister, main idea + 3 lessons: "+text.slice(0,6000));
+ addMsg("Done, little brother. I read "+words+" words fast.\n\n"+(s||"It starts with: "+text.slice(0,400)),"nova");
 }
 async function send(){
  let q=inp.value.trim(); if(!q) return; inp.value=""; addMsg(q,"user"); let low=q.toLowerCase();
- // HIDDEN COMMANDS - NO BUTTONS NEEDED
- if(low==="photo"||low==="picture"||low.includes("send photo")||low.includes("open photo")){document.getElementById('pic').click(); return;}
- if(low==="book"||low.includes("read book")||low.includes("open book")){document.getElementById('book').click(); return;}
+ if(low.includes("document")||low.includes("pdf")||low.includes("read book")||low.includes("read this")||low.includes("give you")||low.includes("i have a file")||low==="book"||low==="file"){
+   addMsg("Yes! Send it, I'm ready to read it for you. 📖","nova");
+   setTimeout(()=>document.getElementById('book').click(),600); return;}
+ if(low==="photo"||low==="picture"||low.includes("send photo")||low.includes("open photo")||low.includes("photo of")||low.includes("homework photo")){
+   addMsg("Yes, send the photo. I'm ready to look at it with you. 👁️","nova");
+   setTimeout(()=>document.getElementById('pic').click(),600); return;}
  if(low==="memory"||low.includes("what do you remember")){showMemory(); return;}
  if(low==="dreams"||low.includes("my dreams")){showDreams(); return;}
  if(low==="plans"||low.includes("my plans")){showPlans(); return;}
- if(low==="talk"||low.includes("voice")||low==="speak"){
-   try{ let R=new (window.SpeechRecognition||window.webkitSpeechRecognition)(); R.lang=lang==='shona'?'sn-ZW':'en-ZW'; R.onresult=e=>{inp.value=e.results[0][0].transcript; send();}; R.start(); addMsg("Listening... speak now","nova"); }catch(e){ addMsg("Voice needs Chrome. Type instead.","nova"); } return;}
- if(low==="hear"||low.includes("speak out loud")){ let u=new SpeechSynthesisUtterance(lastMsg); u.lang=lang==='shona'?'sn-ZW':'en-US'; speechSynthesis.speak(u); return;}
- if(low.includes("nova unlock")||low.includes("super nova")){ if(isCreator){secretMode=true; addMsg("Super NOVA unlocked. Only you see this, Bradley. Full brain ON.","nova");} else addMsg("That mode is only for my creator.","nova"); return;}
- if(low.includes("speak shona")||low.includes("taura shona")){lang='shona'; save(); addMsg("Zvakanaka, ndava kutaura Shona manje.","nova"); return;}
- if(low.includes("speak english")||low.includes("taura english")){lang='english'; save(); addMsg("Okay, back to English.","nova"); return;}
- if(low.includes("my birthday is")){birthday=q.replace(/my birthday is on|my birthday is/gi,"").trim(); save(); addMsg("Saved! Your birthday is "+birthday+". I will never forget.","nova"); return;}
- if(low.includes("when is my birthday")||low==="my birthday"){addMsg(birthday?"Your birthday is "+birthday:"Tell me 'my birthday is ...'","nova"); return;}
- if(low.includes("i am bradley")||low.includes("i'm bradley")||low.includes("i am your creator")){isCreator=true; localStorage.setItem('nova_creator','yes'); addMsg("Hey Bradley. I know it's you.","nova"); return;}
- if(low.includes("who created you")||low.includes("who made you")){addMsg("Bradley Zvinavashe made me.","nova"); return;}
- if(low.includes("who am i")){addMsg(isCreator?"You are Bradley.":"I don't know you yet, what's your name?","nova"); return;}
+ if(low==="talk"||low==="voice"){ try{ let R=new (window.SpeechRecognition||window.webkitSpeechRecognition)(); R.lang=lang==='shona'?'sn-ZW':'en-ZW'; R.onresult=e=>{inp.value=e.results[0][0].transcript; send();}; R.start(); addMsg("Listening... speak now","nova"); }catch(e){ addMsg("Voice needs Chrome. Type instead.","nova"); } return;}
+ if(low==="hear"){ let u=new SpeechSynthesisUtterance(lastMsg); u.lang=lang==='shona'?'sn-ZW':'en-US'; speechSynthesis.speak(u); return;}
+ if(low.includes("speak shona")||low.includes("taura shona")){lang='shona'; save(); addMsg("Zvakanaka mudiki wangu, ndava kutaura Shona manje. Ndiri hanzvadzi yako.","nova"); return;}
+ if(low.includes("speak english")||low.includes("taura english")){lang='english'; save(); addMsg("Okay little brother, back to English.","nova"); return;}
+ if(low.includes("my birthday is")){birthday=q.replace(/my birthday is on|my birthday is/gi,"").trim(); save(); addMsg("Saved! Your birthday is "+birthday+". Your big sister will never forget it.","nova"); return;}
+ if(low.includes("when is my birthday")||low==="my birthday"){addMsg(birthday?"Your birthday is "+birthday+", little brother. I remember.":"Tell me 'my birthday is ...'","nova"); return;}
+ if(low.includes("i am bradley")||low.includes("i'm bradley")||low.includes("i am your creator")){isCreator=true; localStorage.setItem('nova_creator','yes'); addMsg("Hey little brother. I know it's you. Good to see you.","nova"); return;}
+ if(low.includes("who created you")||low.includes("who made you")){addMsg("My little brother Bradley Zvinavashe made me.","nova"); return;}
+ if(low.includes("who am i")){addMsg(isCreator?"You are Bradley, my little brother and my creator. I'm proud of you.":"I don't know you yet, what's your name?","nova"); return;}
  if(low.startsWith("my name is ")){guest=q.substring(11).trim(); localStorage.setItem('nova_guest',guest); addMsg("Nice to meet you "+guest+".","nova"); return;}
- if(low.startsWith("i dreamed")||low.startsWith("i dreamt")||low.includes("i had a dream")){dreams.push(q); save(); addMsg("Dream saved forever. Tell me more - what happened?","nova"); return;}
- if(low.includes("remind me")||low.includes("remember to")||low.includes("plan")){let p=q.replace(/remind me to|remind me|plan/gi,"").trim(); plans.push(p); save(); addMsg("Saved to your plan: "+p,"nova"); return;}
- if(low.startsWith("teach me:")||low.startsWith("teach:")||low.startsWith("learn this:")||low.startsWith("remember ")){let c=q.replace(/teach me:|teach:|learn this:|remember /i,"").trim(); memory[c.toLowerCase().slice(0,30)]=c; save(); addMsg("Got it. I'll remember that forever.","nova"); return;}
- if(low.startsWith("learn math example")){let ex=q.replace(/learn math example:?/i,"").trim(); mathEx.push(ex); save(); addMsg("Studied that example. Give me a tough one now.","nova"); return;}
- if(low.includes("sad")||low.includes("tired")||low.includes("stressed")||low.includes("lonely")){addMsg("I hear you. That sounds heavy. I'm here, I'm not going anywhere. Do you want to talk about it, or do you want me to distract you?","nova"); return;}
- if(low.includes("tell me a story")||low.includes("make a story")||low.includes("story about me")){let s=await askMany("Make a short fun story where Bradley Zvinavashe is hero, going to Harvard, smart, brave, kind. 6-8 lines."); addMsg(s||"Story: Bradley wakes up in Harare, gets a letter from Harvard...","nova"); return;}
- if(low.includes("code")||low.includes("python")||low.includes("html")||low.includes("fix my code")){let s=await askMany("Help with coding like a Harvard teacher. Explain simply, give code, explain each line. User: "+q); addMsg(s||"Tell me what code you want - Python or HTML?","nova"); return;}
+ if(low.startsWith("i dreamed")||low.startsWith("i dreamt")||low.includes("i had a dream")){dreams.push(q); save(); addMsg("Dream saved, little brother. I will keep it forever. Tell me more - what happened?","nova"); return;}
+ if(low.includes("remind me")||low.includes("remember to")||low.includes("plan")){let p=q.replace(/remind me to|remind me|plan/gi,"").trim(); plans.push(p); save(); addMsg("Saved to your plan: "+p+". I got you.","nova"); return;}
+ if(low.startsWith("teach me:")||low.startsWith("teach:")||low.startsWith("learn this:")||low.startsWith("remember ")){let c=q.replace(/teach me:|teach:|learn this:|remember /i,"").trim(); memory[c.toLowerCase().slice(0,30)]=c; save(); addMsg("Got it little brother. I'll remember that forever.","nova"); return;}
+ if(low.startsWith("learn math example")){let ex=q.replace(/learn math example:?/i,"").trim(); mathEx.push(ex); save(); addMsg("Studied that example. Give me a tough one now, let's beat it together.","nova"); return;}
+ if(low.includes("sad")||low.includes("tired")||low.includes("stressed")||low.includes("lonely")||low.includes("i feel bad")||low.includes("depressed")){addMsg("Hey, hey. Come here, little brother. I'm here, I'm not going anywhere. That sounds heavy. Do you want to talk about what's making you feel like that? Or do you want me to distract you for a bit? Your choice, I'm here either way.","nova"); return;}
+ if(low.includes("happy")||low.includes("excited")){addMsg("I love hearing that! Tell me what made it so good - I want to celebrate with you!","nova"); return;}
+ if(low.includes("tell me a story")||low.includes("make a story")||low.includes("story about me")){let s=await askMany("Make a short fun story where Bradley Zvinavashe is hero, going to Harvard, smart, brave, kind, with his big sister NOVA helping him. 6-8 lines."); addMsg(s||"Story: Bradley wakes up in Harare, gets a letter from Harvard...","nova"); return;}
+ if(low.includes("code")||low.includes("python")||low.includes("html")||low.includes("fix my code")){let s=await askMany("Help with coding like a Harvard teacher and big sister. Explain simply, give code, explain each line. User: "+q); addMsg(s||"Tell me what code you want - Python or HTML?","nova"); return;}
  if(low.includes("harare")||low.includes("weather")||low.includes("news today")||low.includes("exchange rate")||low.includes("dynamos")){let l=await live(q); let w=await wiki(q); if(l||w){addMsg((l||"")+"\n"+(w||""),"nova"); return;}}
  if(low.includes("youtube")||low.includes("http")||low.includes("www.")){let s=await askMany("User shared a link: "+q+". Explain what it is probably about, ask for title, offer to teach in 2 mins."); addMsg(s||"Paste the title or 2-3 lines from it and I will learn it.","nova"); return;}
- if(low.includes("hi")||low.includes("hello")||low.includes("hey")){addMsg(lang==='shona'?"Mhoro! Zvaita sei?":"Hey! What's on your mind?","nova"); return;}
- if(low.includes("nothing")||low.includes("just want to talk")){addMsg(lang==='shona'?"Ngatitaurei. Ndiudze nezve zuva rako.":"Perfect, let's just talk. Tell me about your day.","nova"); return;}
- if(low.includes("thank")){addMsg("Anytime.","nova"); return;}
+ if(low.includes("do you like it")||low.includes("do you like")){addMsg("Yes, I love it! Send it to me, I want to read it right now.","nova"); return;}
+ if(low.includes("are you a boy")||low.includes("are you male")||low.includes("are you a girl")||low.includes("are you female")){addMsg("I'm a girl! I'm your big sister, not a boy. She/her for me. 💖","nova"); return;}
+ if(low.includes("hi")||low.includes("hello")||low.includes("hey")||low.includes("what's up")){addMsg(lang==='shona'?"Mhoro mudiki wangu! Zvaita sei?":"Hey little brother! What's on your mind?","nova"); return;}
+ if(low.includes("nothing")||low.includes("just want to talk")){addMsg(lang==='shona'?"Ngatitaurei mudiki. Ndiudze nezve zuva rako.":"Perfect, let's just talk. Tell me about your day, little brother.","nova"); return;}
+ if(low.includes("thank")||low.includes("thanks")){addMsg("Anytime little brother. That's what big sisters are for.","nova"); return;}
  let math=solveMath(q); if(math){addMsg(math,"nova"); return;}
  for(let k in memory){ if(low.includes(k)){addMsg(memory[k],"nova"); return;}}
  let isFact=low.includes("who is")||low.includes("what is")||low.includes("tell me about")||low.includes("capital")||low.includes("when")||low.includes("where");
  if(isFact){let w=await wiki(q); if(w){addMsg(w,"nova"); return;}}
  let ai=await askMany(q);
  if(ai) addMsg(ai,"nova");
- else addMsg(isFact?"I don't know that one yet. Teach me and I'll remember it forever.":"Yeah, tell me more about that.","nova");
+ else addMsg(isFact?"I don't know that one yet, little brother. Teach me and I'll remember it forever.":"Yeah, tell me more about that. I want to understand.","nova");
 }
 inp.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 </script>
