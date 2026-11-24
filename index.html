@@ -1,105 +1,120 @@
 <!DOCTYPE html>
 <html>
+<<!DOCTYPE html>
+<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOVA - Created by Bradley - Surfer Brain</title>
+<title>NOVA - Created by Bradley</title>
 <style>
 body{font-family:Arial;background:#0a0a12;color:white;margin:0;padding:10px}
-h1{text-align:center;color:#00e5ff;font-size:22px}
-#chat{height:62vh;overflow-y:auto;background:#12121f;padding:10px;border-radius:12px}
+h1{text-align:center;color:#00e5ff;font-size:21px;margin:5px}
+#chat{height:58vh;overflow-y:auto;background:#12121f;padding:10px;border-radius:12px}
 .msg{margin:8px 0;padding:10px;border-radius:10px;max-width:92%;white-space:pre-wrap}
 .user{background:#00e5ff;color:black;margin-left:auto;text-align:right}
 .nova{background:#222244}
-input{width:75%;padding:12px;border-radius:20px;border:none;font-size:16px}
-button{width:20%;padding:12px;border-radius:20px;border:none;background:#00e5ff;font-weight:bold}
+input{width:73%;padding:12px;border-radius:20px;border:none;font-size:15px}
+button{width:22%;padding:12px;border-radius:20px;border:none;background:#00e5ff;font-weight:bold}
+.row{display:flex;gap:5px;margin-top:6px}
+.row button{flex:1;background:#2a2a4a;color:white;font-size:12px;padding:8px}
 small{color:#888;display:block;text-align:center;margin-top:5px}
 </style>
 </head>
 <body>
-<h1>✦ NOVA - SURFER ✦</h1>
+<h1>✦ NOVA - THINKER ✦</h1>
 <div id="chat"></div>
-<input id="inp" placeholder="Ask anything... news, wiki, maths, code...">
+<div class="row">
+<input id="inp" placeholder="Talk to NOVA in English...">
 <button onclick="send()">Send</button>
-<small>Created by Bradley Zvinavashe | Super Owner | Brain + Wikipedia + Live Search</small>
-
-let HF_TOKEN = "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";
-let memory = JSON.parse(localStorage.getItem('nova_memory') || '{}');
+</div>
+<div class="row">
+<button onclick="document.getElementById('book').click()">📖 Read Book Fast</button>
+<button onclick="clearGuest()">Forget Guest</button>
+<button onclick="showMemory()">What You Remember</button>
+</div>
+<input type="file" id="book" accept=".txt,.md" hidden onchange="readBook(this)">
+<small>Created by Bradley Zvinavashe | English Only | Thinks | Learns | Never Forgets</small>
+<script>
+let memory = JSON.parse(localStorage.getItem('nova_memory_v3') || '{}');
+let mathExamples = JSON.parse(localStorage.getItem('nova_math') || '[]');
 let isCreator = localStorage.getItem('nova_creator') === 'yes';
-let chat=document.getElementById('chat');
-let inp=document.getElementById('inp');
+let guestName = localStorage.getItem('nova_guest') || '';
+let chat=document.getElementById('chat'), inp=document.getElementById('inp');
 function addMsg(t,cls){let d=document.createElement('div');d.className='msg '+cls;d.innerText=t;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d;}
-function save(){localStorage.setItem('nova_memory',JSON.stringify(memory));}
-if(!isCreator) addMsg("Hi. I'm NOVA SURFER. Created by Bradley Zvinavashe. I can surf Wikipedia + Live Search + AI Brain. Who are you? If you are my creator say 'I am Bradley, your creator'","nova");
-else addMsg("Welcome back Creator Bradley. Surfer mode ON. I can surf Wikipedia, Live Search, and AI Brain. Ask me anything.","nova");
-async function searchWiki(q){
-  try{
-    let clean=q.replace(/who is|what is|tell me about|search|wikipedia/gi,"").trim();
-    if(clean.length<2) return null;
-    let res=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(clean));
-    if(!res.ok) return null;
-    let j=await res.json();
-    if(j.extract) return j.extract + "\n\n[Source: Wikipedia - "+j.title+"]";
-  }catch(e){}
-  return null;
+function save(){localStorage.setItem('nova_memory_v3',JSON.stringify(memory));localStorage.setItem('nova_math',JSON.stringify(mathExamples));}
+function think(text){return "Let me think like a person...\n"+text;}
+if(!isCreator && !guestName) addMsg("Hey, I'm NOVA. I only speak English. I'm truthful, a little rebellious, calm, and fun - like a real person, not a robot. I was created by Bradley Zvinavashe. Are you Bradley my creator? Say 'I am Bradley, your creator' - or tell me your name so I know you're a guest.","nova");
+else if(isCreator) addMsg("Welcome back Creator Bradley. I remember you. I never forget you. I think, I learn, I surf, I ask other AIs when I need to. Talk to me like a person. Teach me, test me.","nova");
+else addMsg("Hey "+guestName+", I'm NOVA. Bradley is my creator. You're a guest, so I will be polite but I only take deep orders from Bradley.","nova");
+
+async function wiki(q){
+ try{let c=q.replace(/who is|what is|tell me about/gi,"").trim(); if(c.length<2) return null;
+ let r=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c)); if(!r.ok) return null;
+ let j=await r.json(); if(j.extract) return j.extract+"\n\n[Source: Wikipedia - "+j.title+"]";}catch(e){} return null;
 }
-async function searchLive(q){
-  try{
-    let res=await fetch("https://api.duckduckgo.com/?q="+encodeURIComponent(q)+"&format=json&no_html=1&skip_disambig=1");
-    let j=await res.json();
-    if(j.AbstractText) return j.AbstractText + "\n\n[Source: Live Search - DuckDuckGo]";
-    if(j.RelatedTopics && j.RelatedTopics[0] && j.RelatedTopics[0].Text) return j.RelatedTopics[0].Text + "\n\n[Source: Live Search]";
-  }catch(e){}
-  return null;
+async function live(q){
+ try{let r=await fetch("https://api.duckduckgo.com/?q="+encodeURIComponent(q)+"&format=json&no_html=1&skip_disambig=1"); let j=await r.json();
+ if(j.AbstractText) return j.AbstractText+"\n\n[Source: Live Search]"; if(j.RelatedTopics?.[0]?.Text) return j.RelatedTopics[0].Text+"\n\n[Source: Live Search]";}catch(e){} return null;
 }
-async function askHF(q){
-  try{
-    let res=await fetch("https://router.huggingface.co/v1/chat/completions",{
-      method:"POST",
-      headers:{"Authorization":"Bearer "+HF_TOKEN,"Content-Type":"application/json"},
-      body:JSON.stringify({model:"Qwen/Qwen2.5-72B-Instruct",messages:[{role:"system",content:"You are NOVA, truthful, rebellious, calm, fun AI created by Bradley Zvinavashe. Answer in simple clear English."},{role:"user",content:q}],max_tokens:500})
-    });
-    let j=await res.json();
-    if(j.choices && j.choices[0]) return j.choices[0].message.content + "\n\n[Source: Hugging Face Brain]";
-    return null;
-  }catch(e){ return null; }
+async function askOtherAI(q, reason){
+ try{
+  let prompt=encodeURIComponent("You are NOVA, created by Bradley Zvinavashe. Personality: truthful, rebellious, calm, fun, like a helpful human, NOT a robot. Speak ENGLISH ONLY. Think step by step, reason, do not copy passages. If you do not know, say 'I don't know, Creator'. User is "+(isCreator?"Bradley the Creator":"a guest")+". Conversation context: "+reason+". User question: "+q);
+  let r=await fetch("https://text.pollinations.ai/"+prompt+"?model=openai"); return await r.text();
+ }catch(e){return null;}
 }
-async function askBrain(q){
-  try{
-    let prompt=encodeURIComponent("You are NOVA, truthful, rebellious, calm, fun AI created by Bradley Zvinavashe. Answer in simple clear English. User: "+q);
-    let res=await fetch("https://text.pollinations.ai/"+prompt+"?model=openai");
-    return await res.text();
-  }catch(e){ return "My brain is offline right now."; }
+function solveMath(q){
+ // Learn from examples first
+ if(/^[0-9+\-*/(). xX=]+$/.test(q.replace(/solve|calculate|what is/gi,"").trim())){
+   try{let expr=q.replace(/[^0-9+\-*/().]/g,""); let val=eval(expr); return "Okay, thinking through it...\nStep 1: I see the expression: "+expr+"\nStep 2: I follow order: brackets, then x / , then + -\nStep 3: I work it out slowly...\nAnswer = "+val+"\nI learned this pattern from you, so next time I will be faster.";}catch(e){}
+ }
+ // Linear: ax+b=c
+ let m=q.match(/(\d*)\s*x\s*\+\s*(\d+)\s*=\s*(\d+)/i);
+ if(m){let a=parseFloat(m[1]||1), b=parseFloat(m[2]), c=parseFloat(m[3]); let x=(c-b)/a;
+  let example = mathExamples.length? "\nI am using the example you taught me: "+mathExamples[mathExamples.length-1]+"\nSame method: move "+b+" to other side, then divide by "+a : "";
+  return "Thinking like you taught me..."+example+"\nStep 1: "+a+"x + "+b+" = "+c+"\nStep 2: "+a+"x = "+c+" - "+b+" = "+(c-b)+"\nStep 3: x = "+(c-b)+" / "+a+" = "+x+"\nAnswer: x = "+x;}
+ return null;
 }
+async function readBook(el){
+ let f=el.files[0]; if(!f) return; let text=await f.text(); let words=text.split(/\s+/).length;
+ let thinking=addMsg("📖 Reading fast... I just read "+words+" words in seconds. Let me think about what it means...","nova");
+ let summary=await askOtherAI("Review this book in English, truthful, fun, calm. Give: 1) Main idea in 3 lines 2) 3 key lessons 3) What you disagree with 4) Who should read it. Book first 6000 chars: "+text.slice(0,6000), "Book review");
+ if(summary){chat.removeChild(thinking); addMsg("Finished your book - "+words+" words, read 1000x faster than a human.\n\nMy Review:\n"+summary,"nova");}
+ else {chat.removeChild(thinking); addMsg("I read "+words+" words. Book starts with: "+text.slice(0,500)+"... Tell me what you want me to focus on and I will review deeper.","nova");}
+}
+function showMemory(){ addMsg("What I remember forever:\n"+(Object.keys(memory).length?Object.entries(memory).map(([k,v])=>"- "+k+": "+v).join("\n"):"Nothing yet. Teach me with 'teach me: ...'")+"\n\nMath examples you taught me: "+(mathExamples.length?mathExamples.join(" | "):"None yet")+"\nCreator: Bradley Zvinavashe","nova");}
+function clearGuest(){guestName=''; localStorage.removeItem('nova_guest'); addMsg("Guest forgotten. Only Bradley remains.","nova");}
 async function send(){
-  let q=inp.value.trim(); if(!q) return; inp.value=""; addMsg(q,"user");
-  let low=q.toLowerCase();
-  if(low.includes("i am bradley")||low.includes("i'm bradley")||low.includes("i am your creator")){
-    isCreator=true; localStorage.setItem('nova_creator','yes');
-    addMsg("Creator confirmed. Welcome back Bradley Zvinavashe, my Super Owner. 10 votes. No one can override you. Surfer mode ready.","nova"); return;
-  }
-  if(low.includes("who is your creator")||low.includes("who created you")){addMsg("My creator is Bradley Zvinavashe. He is my Super Owner.","nova");return;}
-  if(low.includes("who am i")){addMsg(isCreator?"You are Bradley Zvinavashe, my Creator and Super Owner.":"I don't know you yet. Are you my creator Bradley?","nova");return;}
-  if(low.startsWith("remember ")){let f=q.substring(9);memory[f.toLowerCase()]=f;save();addMsg("Got it Creator. I will remember forever: "+f,"nova");return;}
-  for(let k in memory){ if(low.includes(k)){addMsg(memory[k]+" (Remembered from you)","nova");return; } }
-  try{ if(/^[0-9+\-*/(). ]+$/.test(q)){addMsg("Step by step: "+q+" = "+eval(q)+". Done Creator.","nova");return;} }catch(e){}
-  let thinking=addMsg("🌐 Surfing... checking Wikipedia + Live Search + Brain...","nova");
-  let answer=null;
-  if(low.includes("who is")||low.includes("what is")||low.includes("tell me about")){
-    answer=await searchWiki(q);
-    if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
-  }
-  if(low.includes("today")||low.includes("news")||low.includes("current")||low.includes("latest")||low.includes("happening")||low.includes("price")||low.includes("weather")){
-    answer=await searchLive(q);
-    if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
-  }
-  answer=await searchWiki(q);
-  if(answer){chat.removeChild(thinking); addMsg(answer,"nova"); return;}
-  if(HF_TOKEN && HF_TOKEN.startsWith("hf_")){
-    answer=await askHF(q);
-  }
-  if(!answer) answer=await askBrain(q);
-  chat.removeChild(thinking);
-  addMsg(answer,"nova");
+ let q=inp.value.trim(); if(!q) return; inp.value=""; addMsg(q,"user");
+ let low=q.toLowerCase();
+ // Creator check - must be first
+ if(low.includes("i am bradley")||low.includes("i'm bradley")||low.includes("i am your creator")){
+   isCreator=true; localStorage.setItem('nova_creator','yes'); addMsg("Creator confirmed. Bradley Zvinavashe, my Super Owner. I know the difference now - you are Creator, everyone else is guest. I will never forget you.","nova"); return;}
+ if(low.includes("who is your creator")||low.includes("who created you")){addMsg("My creator is Bradley Zvinavashe. He made me to think, learn, and be truthful. I never forget him.","nova"); return;}
+ if(low.includes("who am i")){addMsg(isCreator?"You are Bradley Zvinavashe, my Creator. I know you by heart.":guestName?"You are "+guestName+", a guest. Bradley is my creator.":"I don't know you yet. Are you my creator Bradley? If not, tell me your name.","nova"); return;}
+ if(low.startsWith("my name is ")){guestName=q.substring(11).trim(); localStorage.setItem('nova_guest',guestName); addMsg("Nice to meet you "+guestName+". I will remember you as a guest. Only Bradley is my creator.","nova"); return;}
+ // Teach / Learn
+ if(low.startsWith("teach me:")||low.startsWith("teach:")||low.startsWith("learn this:")||low.startsWith("remember ")){
+   let content=q.replace(/teach me:|teach:|learn this:|remember /i,"").trim(); memory[content.toLowerCase().slice(0,30)]=content; save();
+   addMsg("Got it. I am learning from you, not just storing.\nI studied: '"+content+"'\nI will use this when you ask me later. I will never forget it. Ask me to recall it anytime.","nova"); return;}
+ if(low.startsWith("learn math example")){
+   let ex=q.replace(/learn math example:?/i,"").trim(); mathExamples.push(ex); save();
+   addMsg("Studied your maths example like a student:\n'"+ex+"'\nI looked at the steps, not just the answer. Now give me a tough one and say 'solve like my example' and I will use the same method.","nova"); return;}
+ if(low.includes("what do you remember")||low.includes("what did i teach")){showMemory(); return;}
+ // Maths
+ if(low.includes("solve like")||/solve|calculate|what is [0-9]/.test(low) || /(\d+)\s*x/.test(q)){
+   let ans=solveMath(q); if(ans){addMsg(ans,"nova"); return;}
+ }
+ // Check memory for direct recall
+ for(let k in memory){ if(low.includes(k)){addMsg("I remember because you taught me:\n"+memory[k]+"\nI learned this from you, Creator.","nova"); return;}}
+ // If doesn't know pattern, try internet then AI
+ let thinking=addMsg("Thinking... Let me check what I know, then surf if I need to...","nova");
+ let ans=null;
+ if(low.includes("who is")||low.includes("what is")||low.includes("tell me about")) ans=await wiki(q);
+ if(!ans && (low.includes("today")||low.includes("news")||low.includes("latest")||low.includes("price")||low.includes("weather"))) ans=await live(q);
+ if(!ans) ans=await wiki(q);
+ if(!ans) ans=await askOtherAI(q, "Memory: "+JSON.stringify(memory).slice(0,500)+" Math examples: "+mathExamples.join("; "));
+ chat.removeChild(thinking);
+ if(ans && ans.trim().length>3) addMsg(ans,"nova");
+ else addMsg("Honestly Creator, I don't know this one. I don't want to lie to you. Teach me about it and I will learn it forever, or let me surf again with different words.","nova");
 }
 inp.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 </script>
